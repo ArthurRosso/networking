@@ -1,0 +1,8 @@
+http_port 3129 intercept
+http_port 3128
+
+acl bloquear_palavras url_regex -i "/etc/squid/bloqueios.txt"
+
+http_access deny bloquear_palavras
+
+http_access allow all

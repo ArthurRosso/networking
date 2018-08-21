@@ -1,0 +1,22 @@
+No Servidor
+# apt-get install ntp ntp-doc ntp-utils
+
+# /etc/ntp.conf
+
+...	
+restrict 192.168.8.0 mask 255.255.0.0 nomodify notrap
+restrict 10.0.0.0 mask 255.255.0.0 nomodify notrap
+...
+um restrict pra cada rede
+
+# service ntp restart
+
+testando
+#ntpq -p
+
+# ntpdate -u 127.0.0.1
+
+No Cliente
+apt-get install ntpdate
+
+# ntpdate -u 192.168.8.1

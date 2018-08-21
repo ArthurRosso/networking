@@ -1,0 +1,84 @@
+################################################
+#####          Porta, Nome e Cache         #####
+################################################
+#
+http_port 3129 intercept
+http_port 3128
+visible_hostname SenaiRS
+#
+cache_mem 50 MB
+maximum_object_size_in_memory 64 KB
+maximum_object_size 256 MB
+minimum_object_size 10 KB
+cache_swap_low 90
+cache_swap_high 95
+refresh_pattern ^ftp: 15 20% 2280
+refresh_pattern ^gopher: 15 0% 2280
+refresh_pattern . 15 20% 2280
+#
+################################################
+#####                 Log                  #####
+################################################
+#
+cache_access_log /var/log/squid/access.log
+cache_store_log /var/log/squid/store.log
+cache_log /var/log/squid/cache.log
+#Criar um cache em disco de 2GB
+cache_dir ufs /var/spool/squid 2000 16 256
+#
+################################################
+#####                 ACLs                 #####
+################################################
+#
+acl SSL_ports port 443 563
+acl Safe_ports port 80 # http
+acl Safe_ports port 21 # ftp
+acl Safe_ports port 443 563 # https, snews
+acl Safe_ports port 70 # gopher
+acl Safe_ports port 210 # wais
+acl Safe_ports port 280 # http-mgmt
+acl Safe_ports port 488 # gss-http
+acl Safe_ports port 591 # filemaker
+acl Safe_ports port 777 # multiling http
+acl Safe_ports port 901 # swat
+acl Safe_ports port 1025-65535 # portas altas
+acl purge method PURGE
+acl CONNECT method CONNECT
+#Bloquear as portas não sitadas
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+#
+################################################
+#####          Direitos de Acessos         #####
+################################################
+#
+http_access allow manager localhost
+http_access deny manager
+http_access allow purge localhost
+http_access deny purge
+#
+################################################
+####           BLOQUEAR PALAVRAS            ####
+################################################
+#
+acl bloquear_palavras url_regex -i "/etc/squid/bloqueios.txt"
+#
+#Lembrar de criar o arquivo bloqueios.txt com as palavras proibidas
+#
+http_access deny bloquear_palavras
+#
+################################################
+#####              Rede Local               ####
+################################################
+acl redelocal src 192.168.0.0/24
+#
+################################################
+####           Liberando as Redes           ####
+################################################
+http_access allow localhost
+http_access allow redelocal
+#
+################################################
+####        Bloqueando todo o Resto         ####
+################################################
+http_access deny all 

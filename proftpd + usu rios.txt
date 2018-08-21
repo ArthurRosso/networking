@@ -1,0 +1,41 @@
+******************** CONFIGURANDO PROFTPD ********************
+
+Primeiramente devemos instalar o pacote do proftpd.
+#apt-get install proftpd
+
+Entrar no diretorio do Proftpd.
+#cd /etc/proftpd
+
+Depois devemos configurar o arquivo.
+#nano /etc/proftpd/proftpd.conf
+
+Dentro do arquivo configura-lo da seguinte maneira:
+
+            ##########################################
+LINHA 11  - ##UseIPv6	      off                   ## - //Colocar "OFF" no lugar do "ON".
+LINHA 34  - ##DefaultRoot     ~                     ## - //Descomentar.
+            ##########################################
+
+
+******************** REINICIAR O FTP ******************
+Logo apos as configurações necessarias vamos restaurar o serviço.
+#service proftpd restart
+
+
+******************** CRIAR O USUARIO FTP NO SEU DEVIDO DIRETORIO ******************
+Para criar o usuario dentro do diretorio.
+#useradd -d /var/www/www.SeuSite.com NomeUsuario  |-> "/var/www/ww.SeuSite.com" é o diretorio home e "NomeUsuario" é o usuário.
+
+Colocando a senha ao usuario.
+#passwd NomeUsuario
+
+******************** Modificando as permissões de usuario e grupo *******************
+
+Para cada usuario ter acesso ao seu devido diretorio quando acessado via ftp devemos modificar as permissões.
+#chown -R NomeUsuario:www-data /var/www/www.SeuSite.com
+
+
+******************** Acessar com o cliente por FTP ********************
+
+No cliente na barra do navegador
+#ftp://IP_OU_NOME_DO_DOMINIO_DO_SERVIDOR.

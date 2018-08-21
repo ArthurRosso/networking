@@ -1,0 +1,1 @@
+Click "Administrative Templates," "System," then "Windows Time Service."

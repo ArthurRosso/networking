@@ -1,0 +1,59 @@
+####### Instalar #############################
+
+apt-get install apache2
+
+apt-get install php7.0
+
+apt-get install libapache2-mod-php7.0
+
+apt-get install postfix
+
+apt-get install courier-imap-ssl
+
+apt-get install courier-authdaemon
+
+apt-get install squirrelmail
+
+
+
+####### Configurar o Postfix #################
+
+no arquivo /etc/postfix/main.cf
+
+...
+myhostname = seu_dominio.com			### Trocar o nome pela sua zona
+...
+# mailbox_command = procmail -a "$EXTENSION"	### Comentar a linha
+...
+home_mailbox = Maildir/				### Adicionar na última Linha
+
+
+
+######## Configurar o Apache2 ################
+
+No arquivo /etc/apache2/sites-enabled/000-default
+
+copiar o conteudo do arquivo /usr/share/squirrelmail/config/apache.conf para dentro do arquivo /etc/apache2/sites-enabled/000-default, fazendo as alterações necessárias.
+
+cat /usr/share/squirrelmail/config/apache.conf >> /etc/apache2/sites-enabled/000-default
+
+Dentro do arquivo /etc/apache2/sites-enabled/000-default descomentar as linhas referentes ao <VirtualHost> e alterar conforme necessário.
+
+
+
+######## Criar os diretórios de e-mail para os usuários #####
+
+No console
+
+logue com a conta do usuário e de o comando "maildirmake ~/Maildir"
+
+para que todos os usuários criados depois tenham conta de email
+maildirmake /etc/skel/Maildir
+
+######## Reiniciar todos os serviços ##################
+systemctl restart apache2
+systemctl restart postfix
+systemctl restart courier-authdaemon
+
+nano /etc/rc.local
+--> adicionar o comando "systemctl start courier-authdaemon" para inicializar com o linux 
