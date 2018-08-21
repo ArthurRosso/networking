@@ -1,0 +1,180 @@
+	systemctl restart networking
+	ifconfig
+	apt-get update
+	apt-get install apache2
+	apt-get install php7.0
+	apt-get install php7.0-mysql
+	apt-get install libapache2-mod-php7.0
+	apt-get install libgd-dev
+	apt-get install mysql-server
+Senha para o root do MySQL = ubuntu
+...
+	apt-get install zabbix-server-mysql
+	apt-get install zabbix-agent
+	apt-get install zabbix-frontend-php
+	apt-get install snmp snmpd
+
+	nano /etc/snmp/snmpd.conf
+...
+#  Listen for connections from the local system only
+###agentAddress  udp:127.0.0.1:161
+...
+              #  Full access from the local $
+###rocommunity public  localhost
+rocommunity public
+              #  Default access to basic sys$
+### rocommunity public  default    -V systemonly
+              #  rocommunity6 is for IPv6
+### rocommunity6 public  default   -V systemonly
+...
+	systemctl restart snmpd.service
+	snmpwalk -Os -c public -v 1 localhost | less
+#Configurar o Apache2
+	cat /usr/share/doc/zabbix-frontend-php/examples/apache.conf >> /etc/apache2/sites-available/000-default.conf
+#Configurar o PHP7
+	nano /etc/php/7.0/apache2/php.ini
+..............................................................
+max_execution_time = 300           -> Linha 368
+max_input_time = 300               -> Linha 378
+post_max_size = 16M                -> Linha 656
+date.timezone = America/Sao_Paulo  -> Linha 924
+..............................................................
+	systemctl restart apache2
+	systemctl status apache2
+
+# Dar permissao para o usuario do apache aos arquivos do zabbix
+	chown -R www-data:www-data /etc/zabbix
+
+#Descompactar o arquivo do Banco de dados do Zabbix
+	gzip -d /usr/share/zabbix-server-mysql/schema.sql.gz
+	gzip -d /usr/share/zabbix-server-mysql/data.sql.gz
+	gzip -d /usr/share/zabbix-server-mysql/images.sql.gz
+
+#Criar o Banco de dados
+	mysql -u root -p  (Vai solicitar a senha)
+	create database zabbix;
+#Sair
+	exit
+
+#Configurar um usuario administrador para o DB zabbix
+	nano /etc/zabbix/zabbix-server.conf
+# Alterar no arquivo
+...
+DBUser=root       -> Linha 98
+...
+DBPasswd=ubuntu   -> Linha 106
+...
+
+#Criar as tabelas no Banco de dados
+	mysql -u root -p zabbix < /usr/share/zabbix-server-mysql/schema.sql  (Vai solicitar a senha)
+	mysql -u root -p zabbix < /usr/share/zabbix-server-mysql/images.sql  (Vai solicitar a senha)
+	mysql -u root -p zabbix < /usr/share/zabbix-server-mysql/data.sql  (Vai solicitar a senha)
+
+
+#resetar a senha o admin
+	mysql -p (Solicita a senha)
+	USE zabbix;
+	UPDATE users SET passwd=md5('newpassword') WHERE alias='Admin';
+#Sair
+	exit
+#Acessar o zabbix:
+	http://IP_DO_SERVIDOR/zabbix
+
+	systemctl restart zabbix-server.service
+
+Configuração:
+1 - Next;
+2 - Next;
+3 - Configure DB connection
+	Database Type = MySQL;
+	Database host = localhost;
+	Database port = 0;
+	Database name = zabbix;
+	User = root;
+	Password = SENHA_DO_BANCO;
+Test connection
+4 - Next;
+5 - Next;
+6 - Finish;
+LOGIN = Admin
+SENHA = SENHA_DO_ZABBIX
+
+# Nos clientes instalar o zabbix-agent e configura-lo em:
+	nano /etc/zabbix/zabbix_agentd.conf
+# Na linha 81 altere o ip do zabbix-server
+	Server=IP_DO_SERVIDOR_ZABBIX
+# Reiniciar o agente zabbix
+	systemctl restart zabbix-agent
+########################################################################3
+# Instalar o ZABBIX
+apt-get install apache2
+apt-get install php5
+apt-get install php5-mysql  #################
+apt-get install mysql-server-5.5
+apt-get install zabbix-server-mysql
+apt-get install zabbix-agent
+apt-get install zabbix-frontend-php
+
+# Configurar o Apache
+cat /usr/share/doc/zabbix-frontend-php/examples/apache.conf >> /etc/apache2/sites-available/default
+
+# Dar permissao para o usuario do apache aos arquivos do zabbix
+chown -R www-data:www-data /etc/zabbix
+
+#Descompactar o arquivo do Banco de dados do Zabbix
+gzip -d /usr/share/zabbix-server-mysql/schema.sql.gz
+gzip -d /usr/share/zabbix-server-mysql/data.sql.gz
+gzip -d /usr/share/zabbix-server-mysql/images.sql.gz
+
+#Criar o Banco de dados
+mysql -u root -p  (Vai solicitar a senha)
+create database zabbix;
+#Criar um usuario administrador para o DB zabbix
+GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';
+#Sair
+exit
+
+#Criar as tabelas no Banco de dados
+mysql -u root -p zabbix < /usr/share/zabbix-server-mysql/schema.sql  (Vai solicitar a senha)
+mysql -u root -p zabbix < /usr/share/zabbix-server-mysql/images.sql  (Vai solicitar a senha)
+mysql -u root -p zabbix < /usr/share/zabbix-server-mysql/data.sql  (Vai solicitar a senha)
+
+
+#resetar a senha o admin
+mysql -p (Solicita a senha)
+USE zabbix;
+UPDATE users SET passwd=md5('newpassword') WHERE alias='Admin';
+#Sair
+exit
+
+
+# Acessar o ZAbbix no navegador
+http://IP_DO_SERVIDOR/zabbix
+#usuario = admin
+#senha = zabbix
+
+
+# Preparar o PHP
+vim /etc/php5/apache2/php.ini
+
+#Linha 372
+max_execution_time = 300
+#Linha 382
+max_input_time = 300
+#Linha 660
+post_max_size = 16M
+#Linha 884
+date.timezone = America/Sao_Paulo
+
+# Configurar o zabbix_server para iniciar automaticamente
+vim /etc/default/zabbix_server
+#linha 11
+START=yes
+
+
+
+# Nos clientes instalar o zabbix-agent e configura-lo em:
+vi /etc/zabbix/zabbix_agentd.conf
+
+#Na linha 81 altere o ip do zabbix-server
+Server=IP_DO_SERVIDOR_ZABBIX

@@ -1,0 +1,59 @@
+	systemctl restart networking
+	ifconfig
+	apt-get update
+	apt-get install ssh
+	apt-get install apache2
+	apt-get install php7.0
+	apt-get install libapache2-mod-php7.0
+	apt-get install libnet-snmp-perl
+	apt-get install mysql-server
+...
+Senha para o root do MySQL
+...
+	apt-get install snmp snmpd
+	apt-get install cacti
+...
+Servidor web: Apache2
+...
+Configurar banco de dados para cacti com dbconfig-common?  
+sim
+Senha MySQL da aplicação para o cacti: 
+...
+
+	systemctl restart apache2
+	systemctl status apache2
+	nano /etc/snmp/snmp.conf
+...
+#  Listen for connections from the local system only
+###agentAddress  udp:127.0.0.1:161
+...
+              #  Full access from the local $
+###rocommunity public  localhost
+rocommunity public
+              #  Default access to basic sys$
+### rocommunity public  default    -V systemonly
+              #  rocommunity6 is for IPv6
+### rocommunity6 public  default   -V systemonly
+...
+	systemctl restart snmpd.service
+	snmpwalk -Os -c public -v 1 localhost | less
+
+Acessar no Navegador:
+http://IP_DO_SERVIDOR/cacti
+next - next - finish
+Usuário= admin
+Senha= admin
+OBS.: Em seguida teremos que alterar a senha do admin.
+
+
+adicionar dispositivo
+dispositivo -> add -> hostname ip, Host Template (windows (version 2 depois), local linux, cisco), ping e snmp uptime -> save
+
+create graph for this host -> seleciona todos os host e os tipos de grafico que quer que apareça> create
+
+graph trees -> add para nova arvore ou clicar em default -> add -> em header mudar pra host, selecionar a maquina - create
+
+criar diferentes tipos de graficos (login de usuario por exemplo)
+graph management - > add -> select graphic template e escolhe o tipo (EX:logged in usser e loader overage), host e create
+http://techmago.sytes.net/wiki/index.php/Cacti_-_Instalacao_e_Configuracao
+

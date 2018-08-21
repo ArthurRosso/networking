@@ -1,0 +1,82 @@
+/* Configurando o Nome */
+
+enable
+conf t
+hostname R0
+
+/* Configurando Mensagem de Banner */
+
+enable
+conf t
+banner motd #
+Cuidado, uso restrito #
+
+/* Configurando Senhas de Acesso Console */
+
+enable
+conf t
+line console 0
+password senai
+login
+exit
+
+/* Configurando Senha de Acesso Telnet e SSH */
+
+enable
+conf t
+line vty 0 15
+password senai
+login
+exit
+
+/* Configurando Criptografia de Senhas */
+
+enable
+conf t
+service password-encryption
+
+/* Roteamento estático */
+route 0.0.0.0 255.255.255.0 0.0.0.0
+end
+wr
+
+/* Habilitando o Telnet */
+
+enable
+configure terminal
+line vty 0 15
+transport input telnet
+exit
+
+/* Habilitando o SSH */
+
+enable
+conf t
+ip domain name senai.com.br
+crypto key generate rsa
+1024
+ip ssh version ?
+ip ssh version 2
+line vty 0 15
+password senai
+login
+transport input ssh
+
+/* Roteamento dinâmico - RIP */
+router rip
+version 2
+network 0.0.0.0
+end
+wr
+
+/* Roteamento dinâmico - EIGRP */
+router eigrp
+network 0.0.0.0
+end
+wr
+
+/* Roteamento dinâmico - OSPF */
+router ospf 97
+net 0.0.0.0 0.0.0.255 Area 0
+end
+wr

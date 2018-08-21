@@ -1,0 +1,68 @@
+	sudo su - (Logar como Administrador)
+	ubuntu
+
+	systemctl restart networking (Reiniciar as interfaces de rede)
+	ifconfig (Verificar os IPs da máquina)
+	apt-get update (Atualizar o repositório de aplicativos)
+
+	apt-get install snmp snmpd (Instalar o SNMP e o SNMPD)
+	nano /etc/snmp/snmpd.conf (Editar o arquivo de configuração do SNMPD)
+
+...
+#  Listen for connections from the local system only
+###agentAddress  udp:127.0.0.1:161
+...
+              #  Full access from the local $
+###rocommunity public  localhost
+rocommunity public
+              #  Default access to basic sys$
+### rocommunity public  default    -V systemonly
+              #  rocommunity6 is for IPv6
+### rocommunity6 public  default   -V systemonly
+...
+	systemctl restart snmpd.service
+
+	snmpwalk -Os -c public -v 1 localhost | less (Testar o SNMP)
+
+	apt-get install ssh (Instalar o serviço de acesso remoto)
+	apt-get install apache2 (Instalar o Servidor WEB)
+	apt-get install mrtg (Instalar o MRTG)
+...
+Tornar o /etc/mrtg.cfg propriedade de, e legível apenas pelo root?
+<Sim>
+...
+
+	mkdir /etc/mrtg (Criar um diretório de configuração do MRTG)
+	cfgmaker --output /etc/mrtg/local.cfg public@127.0.0.1 (Criar os arquivos de configuração)
+	nano /etc/mrtg/local.cfg (Editar o arquivo de configuração)
+...
+WorkDir: /var/www/mrtg
+Language: brazilian
+Options[_]: bits,growright
+RunAsDaemon: yes
+Target[EXEMPLO]: 1:public@127.0.0.1:
+MaxBytes[EXEMPLO]: 32000
+AbsMax[EXEMPLO]: 32000
+Unscaled[EXEMPLO]: dwmy
+Title[EXEMPLO]: Análise de Tráfego - link de 256kbps
+PageTop[EXEMPLO]: <h1>Análise de Tráfego - link de 256kbps</h1>
+...
+
+	export LANG=C (Ativar suporte a linguagem C)
+	mkdir /var/www/mrtg (Criar o diretório para o site do MRTG)
+	nano /etc/apache2/sites-available/000-default.conf (Editar o Servidor WEB)
+...
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/
+...
+
+	systemctl restart apache2 (Reiniciar o servidor WEB)
+	systemctl status apache2  (Verificar o status do servidor WEB)
+
+
+
+	indexmaker --output=/var/www/mrtg/index.html /etc/mrtg/local.cfg (Criar o site do MRTG)
+	mrtg /etc/mrtg/local.cfg (Configurar o MRTG)
+
+Acessar no Navegador:
+http://IP_DO_SERVIDOR/mrtg

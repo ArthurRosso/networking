@@ -1,0 +1,56 @@
+	systemctl restart networking
+	ifconfig
+	apt-get update
+	apt-get install apache2
+	apt-get install php7.0
+	apt-get install libapache2-mod-php7.0
+	apt-get install libgd-dev
+	apt-get install mysql-server
+Senha para o root do MySQL = ubuntu
+...
+	apt-get install nagios3
+...
+Postfix
+Tipo de servidor de email = Site da Internet
+Nome de email do sistema = senai.com
+Nagios
+Senha de administração do nagios: ubuntu
+
+
+	apt-get install snmp snmpd
+
+	nano /etc/snmp/snmpd.conf
+...
+#  Listen for connections from the local system only
+###agentAddress  udp:127.0.0.1:161
+...
+              #  Full access from the local $
+###rocommunity public  localhost
+rocommunity public
+              #  Default access to basic sys$
+### rocommunity public  default    -V systemonly
+              #  rocommunity6 is for IPv6
+### rocommunity6 public  default   -V systemonly
+...
+	systemctl restart snmpd.service
+	snmpwalk -Os -c public -v 1 localhost | less
+
+ACESSAR O SITE
+http://IP_DO_SERVIDOR/nagios3
+Usuário = nagiosadmin
+Senha = A_QUE_FOI_CONFIGURADA_NA_INSTALACAO
+
+Ativar o SSh
+apt-get install ssh
+
+Permitir acesso ao gerenciamento de disco:
+Este é o bug # 615848.
+Edite o arquivo ->  nano /etc/nagios-plugins/config/disk.cfg e adicione os argumentos 
+[-A -i '.gvfs'] no final dos argumentos da linha de comando para
+o comando check_disk e check_all_disks.
+
+Criar novos hosts
+cp /etc/nagios3/conf.d/localhost_nagios2.cfg /etc/nagios3/conf.d/NOME_DO_HOST_nagios2.cfg 
+nano /etc/nagios3/conf.d/NOME_DO_HOST_nagios2.cfg
+## Alterar os "localhost" pelo "NOME_DO_HOST"
+## Configurar os serviços

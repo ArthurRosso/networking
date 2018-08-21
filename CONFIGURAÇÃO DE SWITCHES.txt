@@ -1,0 +1,185 @@
+/* Configurando o Nome */
+
+enable
+conf t
+hostname SW0
+
+/*Configurando Mensagem de Banner */
+
+enable
+conf t
+banner motd #
+Cuidado, uso restrito #
+
+/* Configurando Senhas de Acesso Console */
+
+enable
+conf t
+line console 0
+password senai
+login
+exit
+
+/* Configurando Senha de Acesso Telnet e SSH */
+
+enable
+conf t
+line vty 0 15
+password senai
+login
+exit
+
+/* Configurando Criptografia de Senhas */
+
+enable
+conf t
+service password-encryption
+
+/* Configurando Interface de Gerenciamento
+ (Interface Virtual) */
+
+enable
+conf t
+interface vlan 1
+description Interface de Gerenciamento
+ip address 192.168.10.1 255.255.255.0
+no shutdown
+
+/* Atribuindo um Endereço de Gateway */
+
+enable
+conf t
+ip default-gateway 192.168.1.254
+
+/* Habilitando o Telnet */
+
+enable
+configure terminal
+line vty 0 15
+transport input telnet
+exit
+
+/* Habilitando o SSH */
+
+enable
+conf t
+ip domain name senai.com.br
+crypto key generate rsa
+1024
+ip ssh version ?
+ip ssh version 2
+line vty 0 15
+password senai
+login
+transport input ssh
+
+
+/* Verificando as Configurações */
+
+enable
+show running-config
+
+show interfaces fastEthernet 0/1
+
+show interfaces vlan 1
+
+show ip interface brief
+
+show mac-address-table
+
+show port-security
+
+/* Salvando as Configurações */
+
+enable
+wr
+
+/* Configurações de Segurança – Port-Security
+MAC - ESTÁTICO */
+
+enable
+configure terminal
+interface fastethernet 0/2
+switchport mode access
+switchport port-security
+switchport port-security mac-address xxxx.xxxx.xxxx
+switchport port-security violation shutdown
+exit
+
+
+/* Configurações de Segurança – Port-Security
+MAC - DINÂMICO */
+
+enable
+configure terminal
+interface fastethernet 0/2
+switchport mode access
+switchport port-security
+switchport port-security mac-address sticky
+switchport port-security violation shutdown
+exit
+
+/* Criar VLAN: */
+
+enable
+configure terminal
+vlan (nº vlan)
+name (name)
+exit
+vlan (nº vlan)
+name (name)
+exit
+
+/* Atribuir uma única interface (porta) a uma VLAN: */
+
+enable
+configure terminal
+interface fastEthernet 0/2
+switchport mode access
+switchport access vlan 10
+exit
+interface fastEthernet 0/3
+switchport mode access
+switchport access vlan 20
+exit
+
+/* Atribuir um grupo de interfaces (portas) a uma VLAN: */
+
+enable
+configure terminal
+interface range fastEthernet 0/4 - 10
+switchport mode access
+switchport access vlan 10
+exit
+
+/* Excluindo uma VLAN: */
+
+enable
+configure terminal
+no vlan 10
+exit
+
+/* Ou */
+
+enable
+configure terminal
+no vlan 10
+no switchport access vlan
+exit
+
+/* Comandos para verificação das VLANs */
+
+enable
+show vlan brief
+show vlan (nº vlan)
+show vlan (name)
+show interfaces switchport
+show interfaces fastethernet 0/1 switchport
+
+/* Configurando portas tronco */
+enable
+configure terminal
+interface fastEthernet 0/20
+switchport mode trunk 
+exit
+

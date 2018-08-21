@@ -1,0 +1,14 @@
+	systemctl restart networking
+	ifconfig
+	apt-get update
+	apt-get install ssh
+	apt-get install apache2
+	apt-get install ntop
+...
+Indicar a interface que será monitorada
+Definir uma senha de ADMINISTRADOR do NTOP
+...
+	ntop  (Executar o NTOP)
+
+Acessar o ntop no site:
+http://IP_DO_SERVIDOR:3000
